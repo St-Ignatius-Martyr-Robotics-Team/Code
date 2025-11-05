@@ -10,7 +10,7 @@ public class TestShooter extends OpMode {
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
 
-    private double power = 0.5;
+    private double power = 0.65;
 
     @Override
     public void init() {
@@ -25,8 +25,8 @@ public class TestShooter extends OpMode {
     public void loop() {
 
         if(gamepad1.a) {
-            shooterLeft.setPower(0.65);
-            shooterRight.setPower(0.65);
+            shooterLeft.setPower(power);
+            shooterRight.setPower(power);
         }
     }
 }
