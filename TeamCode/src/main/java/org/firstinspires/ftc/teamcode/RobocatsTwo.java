@@ -6,10 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
-public class Robocats extends OpMode {
+public class RobocatsTwo extends OpMode {
     private CRServo feeder;
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -18,18 +17,19 @@ public class Robocats extends OpMode {
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
     private Servo scooper;
+    private CRServo ramp;
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
-    private final double SHOOTER_POWER = 0.72;
+    private final double SHOOTER_POWER = 0.70;
     private final double FEEDER_POWER = 1.0;
     private final double INTAKE_POWER = 0.5;
     private boolean feederOn = false;
     private boolean shootersOn = false;
     private boolean intakesOn = false;
+    private boolean rampOn = false;
     private final double SCOOPER_DOWN = 0.0;
     private final double SCOOPER_UP = 0.5;
     private boolean isUp = false;
-    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void init() {
@@ -37,6 +37,7 @@ public class Robocats extends OpMode {
         shooterLeft = hardwareMap.get(DcMotor.class, "shooterLeft");
         shooterRight = hardwareMap.get(DcMotor.class, "shooterRight");
         scooper = hardwareMap.get(Servo.class, "scooper");
+        ramp= hardwareMap.get(CRServo.class, "ramp");
         intakeLeft = hardwareMap.get(DcMotor.class, "intakeLeft");
         intakeRight = hardwareMap.get(DcMotor.class, "intakeRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -49,6 +50,7 @@ public class Robocats extends OpMode {
         shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setDirection(CRServo.Direction.REVERSE);
         scooper.setDirection(Servo.Direction.FORWARD);
+        ramp.setDirection(CRServo.Direction.FORWARD);
         intakeLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -58,6 +60,8 @@ public class Robocats extends OpMode {
 
         scooper.scaleRange(0.0, 1.0);
         scooper.setPosition(SCOOPER_DOWN);
+
+
     }
 
     @Override
@@ -81,16 +85,12 @@ public class Robocats extends OpMode {
             shootersOn = false;
         }
 
-        if (gamepad2.b) {
-            runtime.reset();
-
-            scooper.setPosition(SCOOPER_UP);
-            while(runtime.seconds() < 0.5)
-            {
-
-            }
-            scooper.setPosition(SCOOPER_DOWN);
+        if (gamepad2.b && !isUp) {
+            scooper.setPosition(SCOOPER_UP);  // move up ~90°
             isUp = true;
+        } else if (gamepad2.b && isUp) {
+            scooper.setPosition(SCOOPER_DOWN);  // move back down
+            isUp = false;
         }
 
         if(gamepad2.x && !intakesOn) {
@@ -101,6 +101,22 @@ public class Robocats extends OpMode {
             intakeLeft.setPower(0.0);
             intakeRight.setPower(0.0);
             intakesOn = false;
+        }
+
+        if(gamepad1.dpad_up && !rampOn) {
+            ramp.setDirection(CRServo.Direction.FORWARD);
+            ramp.setPower(0.5);
+            rampOn = true;
+        }else if (gamepad1.dpad_down && !rampOn) {
+            ramp.setDirection(CRServo.Direction.REVERSE);
+            ramp.setPower(0.5);
+            rampOn = true;
+        }else if (gamepad1.dpad_up && rampOn) {
+            ramp.setPower(0.0);
+            rampOn = false;
+        }else if (gamepad1.dpad_down && rampOn) {
+            ramp.setPower(0.0);
+            rampOn = false;
         }
 
         double leftPower = -gamepad1.left_stick_y;
