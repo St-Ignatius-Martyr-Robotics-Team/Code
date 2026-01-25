@@ -28,8 +28,8 @@ public class FarLaunchAutoRed extends LinearOpMode {
     private final double TURN_POWER = 1.0;
     private final double SHOOTER_POWER = 1.0;
     private final double INTAKE_POWER = -1.0;
-    private final double INTAKE_WHEEL_LEFT_FORWARD = 1.0;
-    private final double INTAKE_WHEEL_RIGHT_FORWARD = 0.0;
+    //private final double INTAKE_WHEEL_LEFT_FORWARD = 1.0;
+    //private final double INTAKE_WHEEL_RIGHT_FORWARD = 0.0;
 
     private final double FEEDER_STOP = 0.5;
     private final double FEEDER_FORWARD = 1.0;
@@ -37,11 +37,12 @@ public class FarLaunchAutoRed extends LinearOpMode {
     // ===========================
     // TIMING CONSTANTS
     // ===========================
-    private final long DRIVE_FORWARD_TIME_1 = 3100;
+    private final long DRIVE_FORWARD_TIME_1 = 1800;
     private final long DRIVE_FORWARD_TIME_2 = 1200;
-    private final long TURN_RIGHT_TIME = 600;
+    private final long TURN_RIGHT_TIME = 400;
+    private final long TURN_LEFT_TIME = 500;
     private final long SHOOTER_SPINUP_TIME = 1400;
-    private final long FEEDER_PUSH_TIME = 300;
+    private final long FEEDER_PUSH_TIME = 600;
     private final long FEEDER_RESET_TIME = 600;
 
     @Override
@@ -89,21 +90,23 @@ public class FarLaunchAutoRed extends LinearOpMode {
         // 1. DRIVE FORWARD
         // ---------------------------
         driveForward(DRIVE_FORWARD_TIME_1);
-
+        sleep(2000);
         // ---------------------------
-        // 2. TURN RIGHT
+        // 2. TURN RIGHT (mirror)
         // ---------------------------
         turnRight(TURN_RIGHT_TIME);
+        sleep(2000);
 
         // ---------------------------
         // 3. SPIN UP SHOOTERS + INTAKE
         // ---------------------------
         shooterLeft.setPower(SHOOTER_POWER);
         shooterRight.setPower(SHOOTER_POWER);
+        sleep(1000);
 
         intake.setPower(INTAKE_POWER);
-        intakeWheelLeft.setPosition(INTAKE_WHEEL_LEFT_FORWARD);
-        intakeWheelRight.setPosition(INTAKE_WHEEL_RIGHT_FORWARD);
+        //intakeWheelLeft.setPosition(INTAKE_WHEEL_LEFT_FORWARD);
+        //intakeWheelRight.setPosition(INTAKE_WHEEL_RIGHT_FORWARD);
 
         sleep(SHOOTER_SPINUP_TIME);
 
@@ -113,21 +116,29 @@ public class FarLaunchAutoRed extends LinearOpMode {
         shootRing();
         shootRing();
         shootRing();
+        shootRing();
+        shootRing();
+
 
         // Stop shooter and intake after shooting
         shooterLeft.setPower(0);
         shooterRight.setPower(0);
         intake.setPower(0);
-        intakeWheelLeft.setPosition(0.5);
-        intakeWheelRight.setPosition(0.5);
-
+        //intakeWheelLeft.setPosition(0.5);
+        //intakeWheelRight.setPosition(0.5);
+        sleep(1000);
         // ---------------------------
-        // 5. DRIVE FORWARD
+        // 5. TURN RIGHT (after shooting)
+        // ---------------------------
+        turnLeft(TURN_LEFT_TIME);
+        sleep(1000);
+        // ---------------------------
+        // 6. DRIVE FORWARD slightly
         // ---------------------------
         driveForward(DRIVE_FORWARD_TIME_2);
 
         // ---------------------------
-        // 6. STOP
+        // 7. STOP
         // ---------------------------
         stopDrive();
     }
@@ -145,6 +156,13 @@ public class FarLaunchAutoRed extends LinearOpMode {
     private void turnRight(long timeMs) {
         driveLeft.setPower(TURN_POWER);
         driveRight.setPower(-TURN_POWER);
+        sleep(timeMs);
+        stopDrive();
+    }
+
+    private void turnLeft(long timeMs) {
+        driveLeft.setPower(-TURN_POWER);
+        driveRight.setPower(TURN_POWER);
         sleep(timeMs);
         stopDrive();
     }
